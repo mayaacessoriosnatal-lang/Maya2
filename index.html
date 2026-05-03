@@ -3,9 +3,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAYA — Acessórios ✦</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+<title>MAYA Acessorios</title>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@100;200;300;400&display=swap" rel="stylesheet">
 <style>/* v20260503172725 */
 @font-face { font-family:'Melora'; src:url('Melora.otf') format('opentype'); }
@@ -526,25 +526,25 @@ src="https://www.facebook.com/tr?id=4681163305539876&ev=PageView&noscript=1"
 </div>
 
 <script>
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  ⚙️  CONFIGURAÇÃO — edite apenas aqui                       ║
-// ╚══════════════════════════════════════════════════════════════╝
+// --------------------------------------------------------------
+//   \u2699\ufe0f  CONFIGURA&Ccedil;&Atilde;O \u2014 edite apenas aqui                       
+// --------------------------------------------------------------
 const CONFIG = {
-  // Seu número do WhatsApp (DDI+DDD+número, sem espaços ou traços)
+  // Seu n&uacute;mero do WhatsApp (DDI+DDD+n&uacute;mero, sem espa&ccedil;os ou tra&ccedil;os)
   whatsapp: '5584994668063',
 
-  // ══════════════════════════════════════════════════════════════
-  // ID da sua Google Planilha — veja o guia abaixo para obter
+  // --------------------------------------------------------------
+  // ID da sua Google Planilha \u2014 veja o guia abaixo para obter
   // Formato: docs.google.com/spreadsheets/d/ [ESTE_ID_AQUI] /edit
-  // ══════════════════════════════════════════════════════════════
+  // --------------------------------------------------------------
   sheetId: '1VhIJVylpKAHnLfjBgopYRqd4nSM6d56d2xnlrwHgm4o',
 
-  // Nome da aba dentro da planilha (padrão: "Produtos")
+  // Nome da aba dentro da planilha (padr&atilde;o: "Produtos")
   sheetName: 'Produtos',
 };
 
-// ── Helpers ─────────────────────────────────────────────────────
-const catLabel = c => ({'brinco':'Brincos','colar':'Colares','bolsa':'Bolsas','kit':'Kit & Combo','anel':'Anéis','bracelet':'Braceletes','pulseira':'Pulseiras','necessair':'Necessaire','necessaire':'Necessaire','mix':'Mix'}[c?.toLowerCase()] || c || '');
+// \u2500\u2500 Helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+const catLabel = c => ({'brinco':'Brincos','colar':'Colares','bolsa':'Bolsas','kit':'Kit & Combo','anel':'An&eacute;is','bracelet':'Braceletes','pulseira':'Pulseiras','necessair':'Necessaire','necessaire':'Necessaire','mix':'Mix'}[c?.toLowerCase()] || c || '');
 const fmt = v => 'R$ ' + Number(v).toFixed(2).replace('.',',');
 
 // Converte link compartilhado do Drive para link direto de imagem
@@ -559,32 +559,32 @@ function driveUrl(url) {
   return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w600` : url;
 }
 
-// ── Busca produtos na planilha ───────────────────────────────────
+// \u2500\u2500 Busca produtos na planilha \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 let allProducts = [];
 let currentFilter = 'all';
 
 async function loadProducts() {
   const grid = document.getElementById('productsGrid');
 
-  // URL da API pública do Google Sheets (CSV)
+  // URL da API p&uacute;blica do Google Sheets (CSV)
   const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.sheetName)}`;
 
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error('Planilha não encontrada');
+    if (!res.ok) throw new Error('Planilha n&atilde;o encontrada');
     const csv = await res.text();
     allProducts = parseCSV(csv);
     renderProducts(currentFilter);
   } catch (e) {
     grid.innerHTML = `<div class="error-msg">
-      ⚠️ Não foi possível carregar os produtos.<br>
-      Verifique se o ID da planilha está correto e se ela está publicada como pública.<br><br>
+      \u26a0\ufe0f N&atilde;o foi poss&iacute;vel carregar os produtos.<br>
+      Verifique se o ID da planilha est&aacute; correto e se ela est&aacute; publicada como p&uacute;blica.<br><br>
       <small style="color:var(--peach)">${e.message}</small>
     </div>`;
   }
 }
 
-// Parser CSV simples (suporta vírgula e aspas)
+// Parser CSV simples (suporta v&iacute;rgula e aspas)
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const headers = parseLine(lines[0]).map(h => h.trim().toLowerCase());
@@ -595,13 +595,13 @@ function parseCSV(text) {
     return obj;
   }).map(p => {
     // normaliza chaves com acento
-    if (p['preço'] !== undefined) p.preco = p['preço'];
-    if (p['variações'] !== undefined) p.variacoes = p['variações'];
+    if (p['pre&ccedil;o'] !== undefined) p.preco = p['pre&ccedil;o'];
+    if (p['varia&ccedil;&otilde;es'] !== undefined) p.variacoes = p['varia&ccedil;&otilde;es'];
     if (p['categoria'] === undefined && p['category'] !== undefined) p.categoria = p['category'];
-    // estoque: se não tiver coluna, considera ilimitado (-1)
+    // estoque: se n&atilde;o tiver coluna, considera ilimitado (-1)
     p.estoque = p['estoque'] !== undefined && p['estoque'] !== '' ? parseInt(p['estoque']) : -1;
     return p;
-  }).filter(p => p.nome && (p.preco || p['preço']));
+  }).filter(p => p.nome && (p.preco || p['pre&ccedil;o']));
 }
 
 function parseLine(line) {
@@ -626,7 +626,7 @@ function parseEntrada(str) {
   return isNaN(d) ? null : d;
 }
 
-// ── Render ───────────────────────────────────────────────────────
+// \u2500\u2500 Render \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 function renderProducts(filter) {
   currentFilter = filter;
   const list = (filter === 'all' ? allProducts : allProducts.filter(p => p.categoria?.toLowerCase() === filter))
@@ -641,7 +641,7 @@ function renderProducts(filter) {
       return 0;
     });
   const disponiveis = list.filter(p => p.estoque !== 0).length;
-  document.getElementById('productCount').textContent = `${disponiveis} ${disponiveis === 1 ? 'peça' : 'peças'}`;
+  document.getElementById('productCount').textContent = `${disponiveis} ${disponiveis === 1 ? 'pe&ccedil;a' : 'pe&ccedil;as'}`;
 
   if (!list.length) {
     document.getElementById('productsGrid').innerHTML = `<div class="error-msg">Nenhum produto nesta categoria ainda.</div>`;
@@ -668,8 +668,8 @@ function renderProducts(filter) {
       <div class="product-image">
         <div class="prod-thumb-inner">
           ${imgUrl
-            ? `<img src="${imgUrl}" alt="${p.nome}" loading="lazy" style="cursor:pointer;" onerror="this.parentElement.innerHTML='<div class=prod-placeholder-wrap><div class=prod-icon>◉</div><div class=prod-placeholder-text>${p.nome}</div></div>'">`
-            : `<div class="prod-placeholder-wrap"><div class="prod-icon">◉</div><div class="prod-placeholder-text">${p.nome}</div></div>`
+            ? `<img src="${imgUrl}" alt="${p.nome}" loading="lazy" style="cursor:pointer;" onerror="this.parentElement.innerHTML='<div class=prod-placeholder-wrap><div class=prod-icon>O</div><div class=prod-placeholder-text>${p.nome}</div></div>'">`
+            : `<div class="prod-placeholder-wrap"><div class="prod-icon">O</div><div class="prod-placeholder-text">${p.nome}</div></div>`
           }
         </div>
         ${!esgotado ? `<div class="overlay"><button class="overlay-btn" onclick="event.stopPropagation();addToCart(${idx})">+ Adicionar</button>${imgUrl ? `<button class="overlay-btn" onclick="event.stopPropagation();openProdModal(${idx})" style="margin-top:10px;">Ver produto</button>` : ''}</div>` : `<div class="overlay" style="opacity:1;background:rgba(42,31,26,.3);"><button class="overlay-btn" onclick="event.stopPropagation();aviseMeWhatsapp('${p.nome.replace(/'/g,"\\'")}')">&#9825; Me avise quando chegar</button>${imgUrl ? `<button class="overlay-btn" onclick="event.stopPropagation();openProdModal(${idx})" style="margin-top:10px;">Ver produto</button>` : ''}</div>`}
@@ -702,7 +702,7 @@ function setFilter(filter) {
   document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ── Cart ─────────────────────────────────────────────────────────
+// \u2500\u2500 Cart \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 let cart = [];
 
 const selectedVars = {};
@@ -722,7 +722,7 @@ function addToCart(idx, varOverride) {
   if (ex) ex.qty++;
   else cart.push({ key, name: p.nome, variation, price: Number(p.preco), category: p.categoria, img: driveUrl(p.foto), qty: 1 });
   updateCartUI();
-  showToast(`${p.nome}${variation ? ' · ' + variation : ''} adicionado`);
+  showToast(`${p.nome}${variation ? ' \u00b7 ' + variation : ''} adicionado`);
 }
 function removeFromCart(key) { cart = cart.filter(i => i.key !== key); updateCartUI(); }
 function changeQty(key, d) {
@@ -740,18 +740,18 @@ function updateCartUI() {
   document.getElementById('checkoutBtn').disabled = !cart.length;
   const el = document.getElementById('cartItems');
   if (!cart.length) {
-    el.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">◇</div><div class="cart-empty-text">Carrinho vazio</div></div>`;
+    el.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">\u25c7</div><div class="cart-empty-text">Carrinho vazio</div></div>`;
     return;
   }
   el.innerHTML = cart.map(i => `
     <div class="cart-item">
-      <div class="cart-thumb">${i.img ? `<img src="${i.img}" alt="${i.name}">` : '◉'}</div>
+      <div class="cart-thumb">${i.img ? `<img src="${i.img}" alt="${i.name}">` : 'O'}</div>
       <div>
         <div class="cart-item-cat">${catLabel(i.category)}</div>
         <div class="cart-item-name">${i.name}</div>
         ${i.variation ? `<div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--peach);margin-bottom:6px;">${i.variation}</div>` : ''}
         <div class="cart-item-qty">
-          <button class="qty-btn" onclick="changeQty('${i.key}',-1)">−</button>
+          <button class="qty-btn" onclick="changeQty('${i.key}',-1)">\u2212</button>
           <span class="qty-num">${i.qty}</span>
           <button class="qty-btn" onclick="changeQty('${i.key}',1)">+</button>
         </div>
@@ -771,10 +771,10 @@ function toggleCart() {
 function checkoutWhatsApp() {
   if (!cart.length) return;
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  let msg = '✦ *Pedido MAYA*\n\n';
-  cart.forEach(i => { msg += `• ${i.name}${i.variation ? ' (' + i.variation + ')' : ''} × ${i.qty} — ${fmt(i.price * i.qty)}\n`; });
-  msg += `\n*Total: ${fmt(total)}*\n\nOlá! Gostaria de finalizar esse pedido 🛍`;
-  // Pixel — InitiateCheckout
+  let msg = '* *Pedido MAYA*\n\n';
+  cart.forEach(i => { msg += `\u2022 ${i.name}${i.variation ? ' (' + i.variation + ')' : ''} \u00d7 ${i.qty} \u2014 ${fmt(i.price * i.qty)}\n`; });
+  msg += `\n*Total: ${fmt(total)}*\n\nOl&aacute;! Gostaria de finalizar esse pedido \u1f6cd`;
+  // Pixel \u2014 InitiateCheckout
   if (typeof fbq !== 'undefined') {
     fbq('track', 'InitiateCheckout', { value: total, currency: 'BRL', num_items: cart.length });
   }
@@ -788,7 +788,7 @@ function openLightbox(url, nome) {
   document.getElementById('lightboxNome').textContent = nome;
   document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
-  // Google Analytics — evento ver foto
+  // Google Analytics \u2014 evento ver foto
   if (typeof gtag !== 'undefined') {
     gtag('event', 'ver_foto', {
       event_category: 'produto',
@@ -818,7 +818,7 @@ function aviseMeWhatsapp(nomeProduto) {
   window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-// ── Modal Produto ────────────────────────────────────────────────
+// \u2500\u2500 Modal Produto \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 let modalIdx = null;
 let modalVarSelecionada = null;
 let modalFotos = [];
@@ -842,7 +842,7 @@ const descricaoAuto = (p) => {
 const featsAuto = (p) => {
   const cat = p.categoria?.toLowerCase();
   if (cat === 'necessaire') {
-    return ['Tecido resistente', 'Curadoria Maya', 'Zíper reforçado', 'Uso diário'];
+    return ['Tecido resistente', 'Curadoria Maya', 'Z&iacute;per refor&ccedil;ado', 'Uso di&aacute;rio'];
   }
   const base = ['Liga de alum&iacute;nio', 'Curadoria Maya'];
   if (['brinco','colar','anel','bracelet','pulseira'].includes(cat)) {
@@ -886,7 +886,7 @@ function openProdModal(idx) {
   document.getElementById('modalNome').textContent = p.nome;
   document.getElementById('modalPreco').textContent = fmt(p.preco);
 
-  // Descrição: planilha tem prioridade
+  // Descri&ccedil;&atilde;o: planilha tem prioridade
   document.getElementById('modalDesc').innerHTML = p.descricao && p.descricao.trim()
     ? p.descricao.trim()
     : descricaoAuto(p);
@@ -906,7 +906,7 @@ function openProdModal(idx) {
   document.getElementById('modalPrev').style.display = modalFotos.length > 1 ? 'flex' : 'none';
   document.getElementById('modalNext').style.display = modalFotos.length > 1 ? 'flex' : 'none';
 
-  // Variações
+  // Varia&ccedil;&otilde;es
   document.getElementById('modalVars').innerHTML = vars.map((v,i) => `<button class="prod-modal-var${i===0?' active':''}" onclick="selectModalVar(this,'${v}')">${v}</button>`).join('');
 
   // Features
@@ -976,7 +976,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── Cursor ───────────────────────────────────────────────────────
+// \u2500\u2500 Cursor \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const cur = document.getElementById('cursor'), ring = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
 document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; });
@@ -987,10 +987,10 @@ document.querySelectorAll('button,a').forEach(el => {
 });
 window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60));
 
-// ── Social Proof ─────────────────────────────────────────────────
+// \u2500\u2500 Social Proof \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const SP_NOMES = ['Carol','Ana','Julia','Mariana','Fernanda','Beatriz','Larissa','Camila','Isabela','Leticia','Gabriela','Amanda','Natalia','Rafaela','Bruna'];
-const SP_ACOES = ['adicionou ao carrinho','acabou de comprar','está vendo agora','adorou'];
-const SP_TEMPOS = ['agora mesmo','há 2 min','há 5 min','há 8 min','há 12 min'];
+const SP_ACOES = ['adicionou ao carrinho','acabou de comprar','est&aacute; vendo agora','adorou'];
+const SP_TEMPOS = ['agora mesmo','h&aacute; 2 min','h&aacute; 5 min','h&aacute; 8 min','h&aacute; 12 min'];
 
 function showSocialProof() {
   if (!allProducts.length) return;
@@ -1012,13 +1012,13 @@ function showSocialProof() {
   setTimeout(() => el.classList.remove('show'), 4000);
 }
 
-// primeira aparição após 8s, depois a cada 12s
+// primeira apari&ccedil;&atilde;o ap&oacute;s 8s, depois a cada 12s
 setTimeout(() => {
   showSocialProof();
   setInterval(showSocialProof, 180000);
 }, 30000);
 
-// ── Imagens do site (aba imagens_site) ──────────────────────────
+// \u2500\u2500 Imagens do site (aba imagens_site) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 async function loadSiteImages() {
   const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=imagens_site`;
   try {
@@ -1043,7 +1043,7 @@ async function loadSiteImages() {
         };
       }
     });
-  } catch(e) { /* aba não existe ainda, ignora */ }
+  } catch(e) { /* aba n&atilde;o existe ainda, ignora */ }
 }
 
 loadProducts();
