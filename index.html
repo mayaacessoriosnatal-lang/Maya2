@@ -330,7 +330,7 @@ src="https://www.facebook.com/tr?id=4681163305539876&ev=PageView&noscript=1"
 
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-eyebrow">Nova Coleção — 2026</div>
+    <div class="hero-eyebrow">Nova Coleção \u2014 2026</div>
     <h1 class="hero-title">Use o<br>que você<br>é.</h1>
     <p class="hero-desc">Brincos, colares, anéis e braceletes selecionados para quem sabe exatamente o que quer.</p>
     <a href="#catalogo" class="hero-cta">Ver Coleção <span>→</span></a>
@@ -399,7 +399,7 @@ src="https://www.facebook.com/tr?id=4681163305539876&ev=PageView&noscript=1"
       <span class="faq-icon">+</span>
     </button>
     <div class="faq-a"><div class="faq-a-inner">
-      Nossas peças são feitas em liga de alumínio com acabamento dourado — não são banhadas nem folheadas a ouro ou prata. São leves, resistentes e com visual elegante, mas como toda bijuteria, pedem cuidado para durar mais tempo.
+      Nossas peças são feitas em liga de alumínio com acabamento dourado \u2014 não são banhadas nem folheadas a ouro ou prata. São leves, resistentes e com visual elegante, mas como toda bijuteria, pedem cuidado para durar mais tempo.
     </div></div>
   </div>
 
@@ -429,7 +429,7 @@ src="https://www.facebook.com/tr?id=4681163305539876&ev=PageView&noscript=1"
       <span class="faq-icon">+</span>
     </button>
     <div class="faq-a"><div class="faq-a-inner">
-      Simples: monte seu carrinho aqui no site, clique em "Finalizar pelo WhatsApp" e a gente confirma tudo por lá — pagamento, entrega e prazo. Rápido e sem complicação.
+      Simples: monte seu carrinho aqui no site, clique em "Finalizar pelo WhatsApp" e a gente confirma tudo por lá \u2014 pagamento, entrega e prazo. Rápido e sem complicação.
     </div></div>
   </div>
 
@@ -466,14 +466,14 @@ src="https://www.facebook.com/tr?id=4681163305539876&ev=PageView&noscript=1"
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="footer-copy">© 2026 Maya — Natal, RN</div>
+    <div class="footer-copy">© 2026 Maya \u2014 Natal, RN</div>
     <div class="footer-copy">Feito com cuidado ✦</div>
   </div>
 </footer>
 
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <div class="cart-drawer" id="cartDrawer">
-  <div class="cart-header"><div class="cart-title">Carrinho</div><button class="cart-close" onclick="toggleCart()">×</button></div>
+  <div class="cart-header"><div class="cart-title">Carrinho</div><button class="cart-close" onclick="toggleCart()">\xd7</button></div>
   <div class="cart-items" id="cartItems"><div class="cart-empty"><div class="cart-empty-icon">◇</div><div class="cart-empty-text">Carrinho vazio</div></div></div>
   <div class="cart-footer">
     <div class="cart-subtotal"><span class="cart-subtotal-label">Total</span><span class="cart-subtotal-value" id="cartTotal">R$ 0,00</span></div>
@@ -772,7 +772,7 @@ function checkoutWhatsApp() {
   if (!cart.length) return;
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   let msg = '* *Pedido MAYA*\n\n';
-  cart.forEach(i => { msg += `\u2022 ${i.name}${i.variation ? ' (' + i.variation + ')' : ''} \u00d7 ${i.qty} \u2014 ${fmt(i.price * i.qty)}\n`; });
+  cart.forEach(i => { msg += `\u2022 ${i.name}${i.variation ? ' (' + i.variation + ')' : ''} \xd7 ${i.qty} \u2014 ${fmt(i.price * i.qty)}\n`; });
   msg += `\n*Total: ${fmt(total)}*\n\nOl&aacute;! Gostaria de finalizar esse pedido \u1f6cd`;
   // Pixel \u2014 InitiateCheckout
   if (typeof fbq !== 'undefined') {
