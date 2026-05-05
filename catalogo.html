@@ -609,7 +609,7 @@
     const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VhIJVylpKAHnLfjBgopYRqd4nSM6d56d2xnlrwHgm4o/edit?gid=0#gid=0";
     const REQUIRED_COLUMNS = {
       name: ["nome", "produto", "titulo", "title", "name"],
-      price: ["preco", "preço", "valor", "price"],
+      price: ["preco", "preço", "preco venda", "preço venda", "preco de venda", "preço de venda", "valor", "valor venda", "valor de venda", "valor unitario", "valor unitário", "preco final", "preço final", "price"],
       description: ["descricao", "descrição", "descrição curta", "descricao curta", "description"],
       image: ["foto", "imagem", "image", "link foto", "link da foto"],
       category: ["categoria", "category"],
@@ -678,7 +678,14 @@
 
     function findColumn(headers, names) {
       const normalizedHeaders = headers.map(normalizeKey);
-      return names.find(name => normalizedHeaders.includes(normalizeKey(name))) || "";
+      const normalizedNames = names.map(normalizeKey);
+      const exactIndex = normalizedHeaders.findIndex(header => normalizedNames.includes(header));
+      if (exactIndex >= 0) return headers[exactIndex];
+
+      const partialIndex = normalizedHeaders.findIndex(header =>
+        normalizedNames.some(name => header.includes(name) || name.includes(header))
+      );
+      return partialIndex >= 0 ? headers[partialIndex] : "";
     }
 
     function parseCsv(text) {
@@ -759,6 +766,24 @@
       return Number.isFinite(number) ? number : null;
     }
 
+    function formatPrice(value = "") {
+      const raw = String(value).trim();
+      if (!raw) return "";
+      if (/[a-zA-Z$€£]/.test(raw)) return raw;
+
+      const normalized = raw
+        .replace(/\s/g, "")
+        .replace(/\./g, "")
+        .replace(",", ".");
+      const number = Number(normalized.match(/-?\d+(\.\d+)?/)?.[0]);
+
+      if (!Number.isFinite(number)) return raw;
+      return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      }).format(number);
+    }
+
     function rowHasStock(product) {
       if (!product.hasStockColumn) return true;
       return product.stock >= 1;
@@ -776,7 +801,7 @@
 
         return {
           name: get("name").trim(),
-          price: get("price").trim(),
+          price: formatPrice(get("price")),
           description: get("description").trim(),
           image: driveImageUrl(get("image")),
           category: get("category").trim() || "Produtos",
@@ -967,7 +992,7 @@
           <div class="product-body">
             <div class="product-top">
               <div class="product-name">${escapeHtml(product.name)}</div>
-              <div class="product-price">${escapeHtml(product.price)}</div>
+              <div class="product-price">${escapeHtml(product.price || "Sob consulta")}</div>
             </div>
             <div class="product-desc">${escapeHtml(product.description)}</div>
             ${detail}
