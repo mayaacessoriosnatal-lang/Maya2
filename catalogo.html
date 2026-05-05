@@ -362,8 +362,8 @@
 
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 7mm 8mm;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6mm;
     }
 
     .product-card {
@@ -377,10 +377,10 @@
 
     .product-image {
       width: 100%;
-      height: 54mm;
+      aspect-ratio: 1;
       border: 1px solid rgba(232, 133, 106, 0.18);
       background: var(--off);
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
 
@@ -398,14 +398,14 @@
 
     .product-name {
       min-width: 0;
-      font-size: 4.2mm;
+      font-size: 3.6mm;
       line-height: 1.14;
       font-weight: 400;
     }
 
     .product-price {
       color: var(--peach-deep);
-      font-size: 3.7mm;
+      font-size: 3.15mm;
       font-weight: 400;
       white-space: nowrap;
     }
@@ -414,7 +414,7 @@
       color: var(--mid);
       display: -webkit-box;
       overflow: hidden;
-      font-size: 2.8mm;
+      font-size: 2.45mm;
       line-height: 1.35;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
@@ -428,24 +428,25 @@
     }
 
     .sheet[data-density="8"] .products-grid {
-      gap: 5mm 7mm;
-    }
-
-    .sheet[data-density="8"] .product-image {
-      height: 38mm;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 5mm;
     }
 
     .sheet[data-density="8"] .product-name {
-      font-size: 3.7mm;
+      font-size: 3.15mm;
     }
 
     .sheet[data-density="8"] .product-price {
-      font-size: 3.25mm;
+      font-size: 2.85mm;
     }
 
     .sheet[data-density="8"] .product-desc {
-      font-size: 2.55mm;
+      font-size: 2.25mm;
       -webkit-line-clamp: 1;
+    }
+
+    .sheet[data-density="8"] .product-code {
+      font-size: 2mm;
     }
 
     a.product-code {
@@ -586,6 +587,27 @@
       }
       .cover-hero {
         border-color: rgba(254, 250, 248, 0.36);
+      }
+      .page-head {
+        align-items: end;
+        flex-direction: row;
+      }
+      .section-title {
+        font-size: 14mm;
+      }
+      .products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 6mm !important;
+      }
+      .sheet[data-density="8"] .products-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 5mm !important;
+      }
+      .product-image {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 !important;
+        object-fit: contain !important;
       }
     }
   </style>
@@ -1049,7 +1071,7 @@
 
     function productImage(product) {
       if (product.image) {
-        return `<img class="product-image" src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" loading="lazy">`;
+        return `<img class="product-image" src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" loading="eager" decoding="sync">`;
       }
       return `<div class="product-image" aria-label="${escapeHtml(product.name)}"></div>`;
     }
@@ -1139,6 +1161,18 @@
       showToast.timer = setTimeout(() => els.toast.classList.remove("show"), 1800);
     }
 
+    function waitForImages() {
+      const images = [...els.catalog.querySelectorAll("img")];
+      const pending = images
+        .filter(image => !image.complete)
+        .map(image => new Promise(resolve => {
+          image.addEventListener("load", resolve, { once: true });
+          image.addEventListener("error", resolve, { once: true });
+        }));
+
+      return Promise.all(pending);
+    }
+
     function applyInitialState() {
       els.sheetUrl.value = state.sheetUrl || DEFAULT_SHEET_URL;
       els.density.value = state.density || "6";
@@ -1150,9 +1184,13 @@
 
     document.querySelector("#loadSheet").addEventListener("click", loadSheet);
     document.querySelector("#sampleData").addEventListener("click", loadSample);
-    document.querySelector("#printPdf").addEventListener("click", () => {
+    document.querySelector("#printPdf").addEventListener("click", async () => {
       saveConfig();
+      setStatus("Preparando imagens para o PDF...");
+      await waitForImages();
+      setStatus("Imagens prontas. Abrindo impressão...");
       window.print();
+      setStatus(`${filteredProducts().length} produtos carregados.`);
     });
 
     [els.collectionFilter, els.categoryFilter, els.density, els.contactLine].forEach(element => {
