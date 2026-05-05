@@ -321,8 +321,8 @@
       padding: 16mm;
       background: var(--white);
       display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 9mm;
+      grid-template-rows: 1fr auto;
+      gap: 8mm;
       page-break-after: always;
       break-after: page;
     }
@@ -383,31 +383,6 @@
       color: rgba(254, 250, 248, 0.78);
     }
 
-    .page-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 10mm;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 4mm;
-    }
-
-    .section-title {
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 14mm;
-      line-height: 1;
-      font-weight: 400;
-    }
-
-    .section-kicker {
-      color: var(--peach-deep);
-      font-size: 3mm;
-      letter-spacing: 1.8mm;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
     .products-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -418,18 +393,20 @@
     .category-sections {
       display: grid;
       align-content: start;
-      gap: 5mm;
+      gap: 6mm;
     }
 
     .category-section {
       display: grid;
       align-content: start;
-      gap: 3mm;
+      gap: 3.5mm;
       break-inside: avoid;
       page-break-inside: avoid;
     }
 
     .category-heading {
+      border-top: 1px solid var(--line);
+      padding-top: 3mm;
       color: var(--peach-deep);
       font-size: 3mm;
       letter-spacing: 1.8mm;
@@ -588,11 +565,6 @@
       .cover-brand { font-size: 64px; }
       .cover-title { font-size: 11px; }
       .cover-note { font-size: 15px; }
-      .page-head {
-        align-items: start;
-        flex-direction: column;
-      }
-      .section-title { font-size: 42px; }
       .products-grid { grid-template-columns: 1fr; }
     }
 
@@ -650,13 +622,6 @@
       }
       .cover-hero {
         border-color: rgba(254, 250, 248, 0.36);
-      }
-      .page-head {
-        align-items: end;
-        flex-direction: row;
-      }
-      .section-title {
-        font-size: 14mm;
       }
       .products-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -1305,14 +1270,10 @@
         </section>
         ${pages.map((pageGroups, index) => `
           <section class="catalog-page">
-            <header class="page-head">
-              <h2 class="section-title">${escapeHtml(pageGroups.length === 1 ? pageGroups[0]?.category || "Produtos" : "Produtos")}</h2>
-              <div class="section-kicker">Maya · ${String(index + 1).padStart(2, "0")}</div>
-            </header>
             <div class="category-sections">
               ${pageGroups.map(group => `
                 <section class="category-section">
-                  ${pageGroups.length > 1 ? `<div class="category-heading">${escapeHtml(group.category)}</div>` : ""}
+                  <div class="category-heading">${escapeHtml(group.category)}</div>
                   <div class="products-grid">
                     ${group.products.map(productCard).join("")}
                   </div>
