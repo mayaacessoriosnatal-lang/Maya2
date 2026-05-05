@@ -428,7 +428,8 @@
       aspect-ratio: 1;
       border: 1px solid rgba(232, 133, 106, 0.18);
       background: var(--off);
-      object-fit: contain;
+      object-fit: cover;
+      object-position: center;
       display: block;
     }
 
@@ -458,16 +459,6 @@
       white-space: nowrap;
     }
 
-    .product-desc {
-      color: var(--mid);
-      display: -webkit-box;
-      overflow: hidden;
-      font-size: 2.45mm;
-      line-height: 1.35;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-    }
-
     .product-code {
       color: var(--light);
       font-size: 2.35mm;
@@ -486,11 +477,6 @@
 
     .sheet[data-density="8"] .product-price {
       font-size: 2.85mm;
-    }
-
-    .sheet[data-density="8"] .product-desc {
-      font-size: 2.25mm;
-      -webkit-line-clamp: 1;
     }
 
     .sheet[data-density="8"] .product-code {
@@ -655,7 +641,8 @@
         width: 100% !important;
         height: auto !important;
         aspect-ratio: 1 !important;
-        object-fit: contain !important;
+        object-fit: cover !important;
+        object-position: center !important;
       }
     }
   </style>
@@ -1161,18 +1148,30 @@
       return chunks;
     }
 
+    function groupedPages(items, perPage) {
+      const groups = [];
+      const categoryOrder = state.categoryOrder || [];
+      const categories = [...new Set(items.map(product => product.category).filter(Boolean))]
+        .sort((a, b) => {
+          const aRank = categoryOrder.includes(a) ? categoryOrder.indexOf(a) : categoryOrder.length;
+          const bRank = categoryOrder.includes(b) ? categoryOrder.indexOf(b) : categoryOrder.length;
+          return aRank - bRank || a.localeCompare(b);
+        });
+
+      categories.forEach(category => {
+        chunk(items.filter(product => product.category === category), perPage).forEach((page, index) => {
+          groups.push({ category, page, categoryPage: index + 1 });
+        });
+      });
+
+      return groups;
+    }
+
     function coverTitle(items) {
       const collection = els.collectionFilter.value;
       if (collection !== "all") return collection;
       const collections = [...new Set(items.map(product => product.collection).filter(Boolean))];
       return collections.length === 1 ? collections[0] : "Catálogo";
-    }
-
-    function categoryTitle(items) {
-      const category = els.categoryFilter.value;
-      if (category !== "all") return category;
-      const categories = [...new Set(items.map(product => product.category).filter(Boolean))];
-      return categories.length === 1 ? categories[0] : "Produtos";
     }
 
     function productImage(product) {
@@ -1195,7 +1194,6 @@
               <div class="product-name">${escapeHtml(product.name)}</div>
               <div class="product-price">${escapeHtml(product.price || "Sob consulta")}</div>
             </div>
-            <div class="product-desc">${escapeHtml(product.description)}</div>
             ${detail}
           </div>
         </article>
@@ -1206,7 +1204,7 @@
       saveConfig();
       const items = filteredProducts();
       const perPage = Number(els.density.value) || 6;
-      const pages = chunk(items, perPage);
+      const pages = groupedPages(items, perPage);
       const totalPageCount = items.length ? pages.length + 1 : 0;
       const now = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date()).replace(".", "");
 
@@ -1222,7 +1220,6 @@
 
       const contact = els.contactLine.value.trim() || "@maya | whatsapp";
       const title = coverTitle(items);
-      const section = categoryTitle(items);
 
       els.catalog.innerHTML = `
         <section class="catalog-page cover">
@@ -1238,14 +1235,14 @@
             <span>${escapeHtml(now)}</span>
           </div>
         </section>
-        ${pages.map((page, index) => `
+        ${pages.map((group, index) => `
           <section class="catalog-page">
             <header class="page-head">
-              <h2 class="section-title">${escapeHtml(section)}</h2>
+              <h2 class="section-title">${escapeHtml(group.category)}</h2>
               <div class="section-kicker">Maya · ${String(index + 1).padStart(2, "0")}</div>
             </header>
             <div class="products-grid">
-              ${page.map(productCard).join("")}
+              ${group.page.map(productCard).join("")}
             </div>
             <footer class="page-footer">
               <span>${escapeHtml(contact)}</span>
