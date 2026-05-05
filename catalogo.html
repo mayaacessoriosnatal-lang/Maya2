@@ -220,6 +220,54 @@
       line-height: 1.45;
     }
 
+    .category-order {
+      display: grid;
+      gap: 7px;
+    }
+
+    .category-order-row {
+      min-height: 40px;
+      border: 1px solid rgba(254, 250, 248, 0.1);
+      border-radius: var(--radius);
+      background: rgba(254, 250, 248, 0.045);
+      display: grid;
+      grid-template-columns: 1fr 34px 34px;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 7px 6px 12px;
+    }
+
+    .category-order-row span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: rgba(254, 250, 248, 0.78);
+      font-size: 12px;
+    }
+
+    .order-button {
+      width: 34px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(254, 250, 248, 0.08);
+      border: 1px solid rgba(254, 250, 248, 0.12);
+      color: rgba(254, 250, 248, 0.78);
+      display: grid;
+      place-items: center;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+
+    .order-button:hover:not(:disabled) {
+      border-color: rgba(242, 169, 142, 0.45);
+      color: var(--white);
+    }
+
+    .order-button:disabled {
+      opacity: 0.34;
+      cursor: default;
+    }
+
     .main {
       min-width: 0;
       padding: 28px;
@@ -659,6 +707,11 @@
       </div>
 
       <div class="control-group">
+        <div class="label">Ordem das categorias</div>
+        <div class="category-order" id="categoryOrder"></div>
+      </div>
+
+      <div class="control-group">
         <div class="label">Resumo</div>
         <div class="stats">
           <div class="stat"><strong id="totalProducts">0</strong><span>produtos</span></div>
@@ -712,6 +765,7 @@
       categoryFilter: document.querySelector("#categoryFilter"),
       density: document.querySelector("#density"),
       contactLine: document.querySelector("#contactLine"),
+      categoryOrder: document.querySelector("#categoryOrder"),
       totalProducts: document.querySelector("#totalProducts"),
       totalPages: document.querySelector("#totalPages"),
       updatedAt: document.querySelector("#updatedAt"),
@@ -734,7 +788,8 @@
         collection: els.collectionFilter.value,
         category: els.categoryFilter.value,
         density: els.density.value,
-        contact: els.contactLine.value.trim()
+        contact: els.contactLine.value.trim(),
+        categoryOrder: state.categoryOrder || []
       };
       localStorage.setItem(CONFIG_KEY, JSON.stringify(state));
     }
@@ -911,8 +966,7 @@
       })
         .filter(product => product.name)
         .filter(rowIsActive)
-        .filter(rowHasStock)
-        .sort((a, b) => a.order - b.order || a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+        .filter(rowHasStock);
     }
 
     async function loadSheet() {
@@ -1028,6 +1082,20 @@
         .sort((a, b) => a.localeCompare(b));
     }
 
+    function syncCategoryOrder() {
+      const categories = uniqueValues("category");
+      const saved = Array.isArray(state.categoryOrder) ? state.categoryOrder : [];
+      if (!categories.length) {
+        state.categoryOrder = saved;
+        return;
+      }
+      state.categoryOrder = [
+        ...saved.filter(category => categories.includes(category)),
+        ...categories.filter(category => !saved.includes(category))
+      ];
+      saveConfig();
+    }
+
     function updateSelect(select, values, selected) {
       const current = selected || select.value || "all";
       select.innerHTML = `<option value="all">Todas</option>${values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
@@ -1035,16 +1103,54 @@
     }
 
     function updateFilters() {
+      syncCategoryOrder();
       updateSelect(els.collectionFilter, uniqueValues("collection"), state.collection);
       updateSelect(els.categoryFilter, uniqueValues("category"), state.category);
+      renderCategoryOrder();
+    }
+
+    function renderCategoryOrder() {
+      const categories = state.categoryOrder || [];
+      if (!categories.length) {
+        els.categoryOrder.innerHTML = `<div class="status">Carregue a planilha para ordenar.</div>`;
+        return;
+      }
+
+      els.categoryOrder.innerHTML = categories.map((category, index) => `
+        <div class="category-order-row">
+          <span>${escapeHtml(category)}</span>
+          <button class="order-button" type="button" data-category-move="${index}" data-direction="-1" aria-label="Subir ${escapeHtml(category)}" ${index === 0 ? "disabled" : ""}>↑</button>
+          <button class="order-button" type="button" data-category-move="${index}" data-direction="1" aria-label="Descer ${escapeHtml(category)}" ${index === categories.length - 1 ? "disabled" : ""}>↓</button>
+        </div>
+      `).join("");
+    }
+
+    function moveCategory(index, direction) {
+      const categories = [...(state.categoryOrder || [])];
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= categories.length) return;
+      const [moved] = categories.splice(index, 1);
+      categories.splice(nextIndex, 0, moved);
+      state.categoryOrder = categories;
+      saveConfig();
+      renderCategoryOrder();
+      render();
     }
 
     function filteredProducts() {
       const collection = els.collectionFilter.value;
       const category = els.categoryFilter.value;
+      const order = state.categoryOrder || [];
       return products
         .filter(product => collection === "all" || product.collection === collection)
-        .filter(product => category === "all" || product.category === category);
+        .filter(product => category === "all" || product.category === category)
+        .sort((a, b) => {
+          const aRank = order.includes(a.category) ? order.indexOf(a.category) : order.length;
+          const bRank = order.includes(b.category) ? order.indexOf(b.category) : order.length;
+          const categoryOrder = aRank - bRank;
+          if (categoryOrder !== 0) return categoryOrder;
+          return a.order - b.order || a.name.localeCompare(b.name);
+        });
     }
 
     function chunk(items, size) {
@@ -1195,6 +1301,12 @@
 
     [els.collectionFilter, els.categoryFilter, els.density, els.contactLine].forEach(element => {
       element.addEventListener("input", render);
+    });
+
+    els.categoryOrder.addEventListener("click", event => {
+      const button = event.target.closest("[data-category-move]");
+      if (!button) return;
+      moveCategory(Number(button.dataset.categoryMove), Number(button.dataset.direction));
     });
 
     applyInitialState();
