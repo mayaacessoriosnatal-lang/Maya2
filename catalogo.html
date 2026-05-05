@@ -318,7 +318,7 @@
     .catalog-page {
       width: 210mm;
       min-height: 297mm;
-      padding: 16mm;
+      padding: 14mm;
       background: var(--white);
       display: grid;
       grid-template-rows: 1fr auto;
@@ -374,7 +374,7 @@
       justify-content: space-between;
       gap: 8mm;
       color: var(--light);
-      font-size: 3mm;
+      font-size: 2.6mm;
       letter-spacing: 1.4mm;
       text-transform: uppercase;
     }
@@ -393,22 +393,22 @@
     .category-sections {
       display: grid;
       align-content: start;
-      gap: 6mm;
+      gap: 5mm;
     }
 
     .category-section {
       display: grid;
       align-content: start;
-      gap: 3.5mm;
+      gap: 3mm;
       break-inside: avoid;
       page-break-inside: avoid;
     }
 
     .category-heading {
       border-top: 1px solid var(--line);
-      padding-top: 3mm;
+      padding-top: 2.5mm;
       color: var(--peach-deep);
-      font-size: 3mm;
+      font-size: 2.7mm;
       letter-spacing: 1.8mm;
       text-transform: uppercase;
     }
@@ -1167,31 +1167,42 @@
       }));
     }
 
+    function groupRows(productCount, columns) {
+      return Math.ceil(productCount / columns);
+    }
+
+    function pageRows(pageGroups, columns) {
+      return pageGroups.reduce((total, group) => total + groupRows(group.products.length, columns), 0);
+    }
+
     function groupedPages(items, perPage) {
       const pages = [];
       let currentPage = [];
-      let currentCount = 0;
+      const columns = perPage === 8 ? 4 : 3;
+      const maxRows = perPage === 8 ? 2 : 3;
 
       categoryGroups(items).forEach(group => {
         let remaining = [...group.products];
 
         while (remaining.length) {
-          const available = perPage - currentCount;
+          const usedRows = pageRows(currentPage, columns);
+          const availableRows = maxRows - usedRows;
+
+          if (availableRows <= 0) {
+            pages.push(currentPage);
+            currentPage = [];
+            continue;
+          }
+
+          const available = availableRows * columns;
           const part = remaining.slice(0, available);
           remaining = remaining.slice(available);
 
-          const existingGroup = currentPage.find(pageGroup => pageGroup.category === group.category);
-          if (existingGroup) {
-            existingGroup.products.push(...part);
-          } else {
-            currentPage.push({ category: group.category, products: part });
-          }
-          currentCount += part.length;
+          currentPage.push({ category: group.category, products: part });
 
-          if (currentCount >= perPage) {
+          if (pageRows(currentPage, columns) >= maxRows) {
             pages.push(currentPage);
             currentPage = [];
-            currentCount = 0;
           }
         }
       });
