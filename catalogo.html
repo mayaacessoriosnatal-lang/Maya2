@@ -606,6 +606,7 @@
 
   <script>
     const CONFIG_KEY = "maya-catalog-config-v1";
+    const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VhIJVylpKAHnLfjBgopYRqd4nSM6d56d2xnlrwHgm4o/edit?gid=0#gid=0";
     const REQUIRED_COLUMNS = {
       name: ["nome", "produto", "titulo", "title", "name"],
       price: ["preco", "preço", "valor", "price"],
@@ -614,6 +615,7 @@
       category: ["categoria", "category"],
       collection: ["colecao", "coleção", "collection"],
       status: ["status", "ativo", "publicar", "exibir"],
+      stock: ["estoque", "estoque atual", "em estoque", "qtd", "quantidade", "quantidade estoque", "saldo", "disponivel", "disponível", "stock", "inventory"],
       order: ["ordem", "order", "posicao", "posição"],
       code: ["codigo", "código", "sku", "referencia", "referência"],
       link: ["link", "url", "produto link", "link produto"]
@@ -745,6 +747,23 @@
       return !["nao", "não", "no", "false", "0", "inativo", "ocultar", "esgotado"].includes(value);
     }
 
+    function parseStock(value = "") {
+      const normalized = String(value)
+        .trim()
+        .replace(/\./g, "")
+        .replace(",", ".");
+
+      if (!normalized) return null;
+
+      const number = Number(normalized.match(/-?\d+(\.\d+)?/)?.[0]);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function rowHasStock(product) {
+      if (!product.hasStockColumn) return true;
+      return product.stock >= 1;
+    }
+
     function mapRows(rows) {
       const headers = rows[0] || [];
       const columns = Object.fromEntries(
@@ -763,6 +782,8 @@
           category: get("category").trim() || "Produtos",
           collection: get("collection").trim() || "Catalogo",
           status: get("status").trim(),
+          stock: parseStock(get("stock")),
+          hasStockColumn: Boolean(columns.stock),
           order: Number(get("order")) || 9999,
           code: get("code").trim(),
           link: get("link").trim()
@@ -770,6 +791,7 @@
       })
         .filter(product => product.name)
         .filter(rowIsActive)
+        .filter(rowHasStock)
         .sort((a, b) => a.order - b.order || a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
     }
 
@@ -1019,11 +1041,12 @@
     }
 
     function applyInitialState() {
-      els.sheetUrl.value = state.sheetUrl || "";
+      els.sheetUrl.value = state.sheetUrl || DEFAULT_SHEET_URL;
       els.density.value = state.density || "6";
       els.contactLine.value = state.contact || "@maya | whatsapp";
       updateFilters();
       render();
+      if (els.sheetUrl.value) loadSheet();
     }
 
     document.querySelector("#loadSheet").addEventListener("click", loadSheet);
