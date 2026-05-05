@@ -411,20 +411,20 @@
     .products-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 7mm 6mm;
+      gap: 5.5mm 6mm;
       align-content: start;
     }
 
     .category-sections {
       display: grid;
       align-content: start;
-      gap: 8mm;
+      gap: 5mm;
     }
 
     .category-section {
       display: grid;
       align-content: start;
-      gap: 4mm;
+      gap: 3mm;
       break-inside: avoid;
       page-break-inside: avoid;
     }
@@ -440,7 +440,7 @@
       min-width: 0;
       display: grid;
       grid-template-rows: auto auto;
-      gap: 3mm;
+      gap: 2.4mm;
       align-content: start;
       break-inside: avoid;
       page-break-inside: avoid;
@@ -493,6 +493,11 @@
     .sheet[data-density="8"] .products-grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 5mm;
+    }
+
+    .sheet[data-density="9"] .products-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5mm 6mm;
     }
 
     .sheet[data-density="8"] .product-name {
@@ -655,14 +660,18 @@
       }
       .products-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: 7mm 6mm !important;
+        gap: 5.5mm 6mm !important;
       }
       .sheet[data-density="8"] .products-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
         gap: 5mm !important;
       }
+      .sheet[data-density="9"] .products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 5mm 6mm !important;
+      }
       .category-sections {
-        gap: 8mm !important;
+        gap: 5mm !important;
       }
       .product-image {
         width: 100% !important;
@@ -710,6 +719,7 @@
         <label class="field">
           <span>Formato</span>
           <select id="density">
+            <option value="9">9 por página</option>
             <option value="6">6 por página</option>
             <option value="8">8 por página</option>
           </select>
@@ -755,6 +765,7 @@
 
   <script>
     const CONFIG_KEY = "maya-catalog-config-v1";
+    const CONFIG_VERSION = 2;
     const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VhIJVylpKAHnLfjBgopYRqd4nSM6d56d2xnlrwHgm4o/edit?gid=0#gid=0";
     const REQUIRED_COLUMNS = {
       name: ["nome", "produto", "titulo", "title", "name"],
@@ -798,6 +809,7 @@
 
     function saveConfig() {
       state = {
+        version: CONFIG_VERSION,
         sheetUrl: els.sheetUrl.value.trim(),
         collection: els.collectionFilter.value,
         category: els.categoryFilter.value,
@@ -1196,14 +1208,19 @@
       let currentCount = 0;
 
       categoryGroups(items).forEach(group => {
-        chunk(group.products, perPage).forEach(part => {
-          if (currentCount > 0 && currentCount + part.length > perPage) {
-            pages.push(currentPage);
-            currentPage = [];
-            currentCount = 0;
-          }
+        let remaining = [...group.products];
 
-          currentPage.push({ category: group.category, products: part });
+        while (remaining.length) {
+          const available = perPage - currentCount;
+          const part = remaining.slice(0, available);
+          remaining = remaining.slice(available);
+
+          const existingGroup = currentPage.find(pageGroup => pageGroup.category === group.category);
+          if (existingGroup) {
+            existingGroup.products.push(...part);
+          } else {
+            currentPage.push({ category: group.category, products: part });
+          }
           currentCount += part.length;
 
           if (currentCount >= perPage) {
@@ -1211,7 +1228,7 @@
             currentPage = [];
             currentCount = 0;
           }
-        });
+        }
       });
 
       if (currentPage.length) pages.push(currentPage);
@@ -1254,7 +1271,7 @@
     function render() {
       saveConfig();
       const items = filteredProducts();
-      const perPage = Number(els.density.value) || 6;
+      const perPage = Number(els.density.value) || 9;
       const pages = groupedPages(items, perPage);
       const totalPageCount = items.length ? pages.length + 1 : 0;
       const now = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date()).replace(".", "");
@@ -1335,8 +1352,9 @@
     }
 
     function applyInitialState() {
+      const shouldUpgradeDensity = !state.version || state.version < CONFIG_VERSION;
       els.sheetUrl.value = state.sheetUrl || DEFAULT_SHEET_URL;
-      els.density.value = state.density || "6";
+      els.density.value = shouldUpgradeDensity ? "9" : state.density || "9";
       els.contactLine.value = state.contact || "@maya | whatsapp";
       updateFilters();
       render();
