@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maya | Catalogo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --peach: #E8856A;
+      --peach-light: #F2A98E;
+      --peach-pale: #F9DDD4;
+      --peach-deep: #C45E42;
+      --white: #FEFAF8;
+      --off: #F5EDE8;
+      --dark: #2A1F1A;
+      --mid: #7A5A4E;
+      --light: #C4A090;
+      --line: rgba(232, 133, 106, 0.22);
+      --shadow: 0 24px 70px rgba(42, 31, 26, 0.08);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--white);
+      color: var(--dark);
+      font-family: "Jost", Arial, sans-serif;
+      font-weight: 300;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      background: var(--dark);
+      color: var(--white);
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .brand {
+      padding: 10px 4px 22px;
+      border-bottom: 1px solid rgba(254, 250, 248, 0.14);
+    }
+
+    .brand-mark {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 46px;
+      line-height: 1;
+      letter-spacing: 4px;
+    }
+
+    .brand-sub {
+      margin-top: 12px;
+      color: rgba(254, 250, 248, 0.62);
+      font-size: 9px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
+
+    .control-group {
+      display: grid;
+      gap: 12px;
+    }
+
+    .label,
+    .field span,
+    .stat span,
+    .chip-label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .label {
+      color: var(--peach-light);
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field span {
+      color: rgba(254, 250, 248, 0.6);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid rgba(254, 250, 248, 0.13);
+      border-radius: var(--radius);
+      background: rgba(254, 250, 248, 0.07);
+      color: var(--white);
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    .field option {
+      color: var(--dark);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(242, 169, 142, 0.62);
+      background: rgba(254, 250, 248, 0.1);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .primary-button,
+    .ghost-button {
+      min-height: 42px;
+      border-radius: var(--radius);
+      padding: 0 14px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .primary-button {
+      background: var(--peach);
+      color: var(--white);
+      box-shadow: 0 12px 26px rgba(232, 133, 106, 0.24);
+    }
+
+    .ghost-button {
+      background: transparent;
+      color: rgba(254, 250, 248, 0.76);
+      border: 1px solid rgba(254, 250, 248, 0.13);
+    }
+
+    .primary-button:hover,
+    .ghost-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-button:hover {
+      background: var(--peach-deep);
+    }
+
+    .ghost-button:hover {
+      border-color: rgba(242, 169, 142, 0.45);
+      color: var(--white);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .stat {
+      border: 1px solid rgba(254, 250, 248, 0.1);
+      border-radius: var(--radius);
+      padding: 16px 12px;
+      background: rgba(254, 250, 248, 0.045);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--peach-light);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 8px;
+      color: rgba(254, 250, 248, 0.54);
+    }
+
+    .status {
+      min-height: 42px;
+      border: 1px solid rgba(254, 250, 248, 0.1);
+      border-radius: var(--radius);
+      padding: 12px;
+      color: rgba(254, 250, 248, 0.68);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 28px;
+      display: grid;
+      gap: 22px;
+    }
+
+    .topbar {
+      min-height: 76px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 22px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(38px, 6vw, 78px);
+      line-height: 0.96;
+      font-weight: 400;
+      letter-spacing: 1px;
+    }
+
+    .page-meta {
+      color: var(--light);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-align: right;
+    }
+
+    .catalog-stage {
+      display: grid;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .sheet {
+      width: min(100%, 960px);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
+    }
+
+    .catalog-page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 16mm;
+      background: var(--white);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 13mm;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .cover {
+      min-height: 297mm;
+      align-content: stretch;
+      grid-template-rows: 1fr auto;
+      background: linear-gradient(180deg, var(--white), #fff7f4);
+    }
+
+    .cover-hero {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid var(--line);
+      padding: 18mm;
+    }
+
+    .cover-brand {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 28mm;
+      line-height: 0.88;
+      letter-spacing: 2mm;
+      font-weight: 400;
+    }
+
+    .cover-title {
+      margin-top: 11mm;
+      color: var(--peach-deep);
+      font-size: 4mm;
+      letter-spacing: 2.4mm;
+      text-transform: uppercase;
+    }
+
+    .cover-note {
+      max-width: 112mm;
+      margin: 10mm auto 0;
+      color: var(--mid);
+      font-size: 4.2mm;
+      line-height: 1.65;
+    }
+
+    .cover-footer,
+    .page-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8mm;
+      color: var(--light);
+      font-size: 3mm;
+      letter-spacing: 1.4mm;
+      text-transform: uppercase;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 10mm;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6mm;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 14mm;
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    .section-kicker {
+      color: var(--peach-deep);
+      font-size: 3mm;
+      letter-spacing: 1.8mm;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9mm 8mm;
+    }
+
+    .product-card {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 4.5mm;
+      break-inside: avoid;
+    }
+
+    .product-image {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      border: 1px solid rgba(232, 133, 106, 0.18);
+      background: var(--off);
+      object-fit: cover;
+      display: block;
+    }
+
+    .product-body {
+      display: grid;
+      gap: 2mm;
+    }
+
+    .product-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 4mm;
+    }
+
+    .product-name {
+      min-width: 0;
+      font-size: 5mm;
+      line-height: 1.14;
+      font-weight: 400;
+    }
+
+    .product-price {
+      color: var(--peach-deep);
+      font-size: 4.4mm;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .product-desc {
+      color: var(--mid);
+      font-size: 3.35mm;
+      line-height: 1.45;
+    }
+
+    .product-code {
+      color: var(--light);
+      font-size: 2.7mm;
+      letter-spacing: 1.2mm;
+      text-transform: uppercase;
+    }
+
+    a.product-code {
+      text-decoration: none;
+      border-bottom: 1px solid rgba(196, 160, 144, 0.45);
+      width: fit-content;
+    }
+
+    .empty-catalog {
+      min-height: 420px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      color: var(--light);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%) translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 30;
+      background: var(--dark);
+      color: var(--white);
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1180px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+      .control-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .catalog-page {
+        width: min(100%, 210mm);
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .main { padding: 18px; }
+      .topbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .page-meta { text-align: left; }
+      .control-grid { grid-template-columns: 1fr; }
+      .button-row { grid-template-columns: 1fr; }
+      .catalog-page {
+        padding: 18px;
+        gap: 26px;
+      }
+      .cover { min-height: 720px; }
+      .cover-brand { font-size: 64px; }
+      .cover-title { font-size: 11px; }
+      .cover-note { font-size: 15px; }
+      .page-head {
+        align-items: start;
+        flex-direction: column;
+      }
+      .section-title { font-size: 42px; }
+      .products-grid { grid-template-columns: 1fr; }
+    }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @media print {
+      body {
+        background: var(--white);
+      }
+      .sidebar,
+      .topbar,
+      .toast {
+        display: none !important;
+      }
+      .app-shell,
+      .main,
+      .catalog-stage,
+      .sheet {
+        display: block;
+        padding: 0;
+        margin: 0;
+        width: 210mm;
+        box-shadow: none;
+        border: 0;
+      }
+      .catalog-page {
+        width: 210mm;
+        min-height: 297mm;
+        box-shadow: none;
+        border: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">MAYA</div>
+        <div class="brand-sub">Catalogo em PDF</div>
+      </div>
+
+      <div class="control-group">
+        <div class="label">Fonte</div>
+        <label class="field">
+          <span>Sheets publicado</span>
+          <input id="sheetUrl" type="url" placeholder="https://docs.google.com/spreadsheets/...">
+        </label>
+        <div class="button-row">
+          <button class="primary-button" type="button" id="loadSheet">Carregar</button>
+          <button class="ghost-button" type="button" id="sampleData">Exemplo</button>
+        </div>
+      </div>
+
+      <div class="control-group control-grid">
+        <label class="field">
+          <span>Colecao</span>
+          <select id="collectionFilter">
+            <option value="all">Todas</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Categoria</span>
+          <select id="categoryFilter">
+            <option value="all">Todas</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Formato</span>
+          <select id="density">
+            <option value="6">6 por pagina</option>
+            <option value="8">8 por pagina</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Contato</span>
+          <input id="contactLine" type="text" value="@maya | whatsapp">
+        </label>
+      </div>
+
+      <div class="control-group">
+        <div class="label">Resumo</div>
+        <div class="stats">
+          <div class="stat"><strong id="totalProducts">0</strong><span>produtos</span></div>
+          <div class="stat"><strong id="totalPages">0</strong><span>paginas</span></div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <button class="primary-button" type="button" id="printPdf">Gerar PDF</button>
+        <div class="status" id="status">Pronto para carregar a planilha.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <h1 class="page-title">Catalogo Maya</h1>
+        <div class="page-meta" id="updatedAt">Aguardando dados</div>
+      </header>
+
+      <section class="catalog-stage">
+        <div class="sheet" id="catalog"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const CONFIG_KEY = "maya-catalog-config-v1";
+    const REQUIRED_COLUMNS = {
+      name: ["nome", "produto", "titulo", "title", "name"],
+      price: ["preco", "preço", "valor", "price"],
+      description: ["descricao", "descrição", "descrição curta", "descricao curta", "description"],
+      image: ["foto", "imagem", "image", "link foto", "link da foto"],
+      category: ["categoria", "category"],
+      collection: ["colecao", "coleção", "collection"],
+      status: ["status", "ativo", "publicar", "exibir"],
+      order: ["ordem", "order", "posicao", "posição"],
+      code: ["codigo", "código", "sku", "referencia", "referência"],
+      link: ["link", "url", "produto link", "link produto"]
+    };
+
+    let products = [];
+    let state = loadConfig();
+
+    const els = {
+      sheetUrl: document.querySelector("#sheetUrl"),
+      collectionFilter: document.querySelector("#collectionFilter"),
+      categoryFilter: document.querySelector("#categoryFilter"),
+      density: document.querySelector("#density"),
+      contactLine: document.querySelector("#contactLine"),
+      totalProducts: document.querySelector("#totalProducts"),
+      totalPages: document.querySelector("#totalPages"),
+      updatedAt: document.querySelector("#updatedAt"),
+      status: document.querySelector("#status"),
+      catalog: document.querySelector("#catalog"),
+      toast: document.querySelector("#toast")
+    };
+
+    function loadConfig() {
+      try {
+        return JSON.parse(localStorage.getItem(CONFIG_KEY)) || {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveConfig() {
+      state = {
+        sheetUrl: els.sheetUrl.value.trim(),
+        collection: els.collectionFilter.value,
+        category: els.categoryFilter.value,
+        density: els.density.value,
+        contact: els.contactLine.value.trim()
+      };
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(state));
+    }
+
+    function escapeHtml(value = "") {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function normalizeKey(value = "") {
+      return String(value)
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ");
+    }
+
+    function findColumn(headers, names) {
+      const normalizedHeaders = headers.map(normalizeKey);
+      return names.find(name => normalizedHeaders.includes(normalizeKey(name))) || "";
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let quoted = false;
+
+      for (let index = 0; index < text.length; index += 1) {
+        const char = text[index];
+        const next = text[index + 1];
+
+        if (char === '"' && quoted && next === '"') {
+          cell += '"';
+          index += 1;
+        } else if (char === '"') {
+          quoted = !quoted;
+        } else if (char === "," && !quoted) {
+          row.push(cell);
+          cell = "";
+        } else if ((char === "\n" || char === "\r") && !quoted) {
+          if (char === "\r" && next === "\n") index += 1;
+          row.push(cell);
+          if (row.some(value => value.trim())) rows.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += char;
+        }
+      }
+
+      row.push(cell);
+      if (row.some(value => value.trim())) rows.push(row);
+      return rows;
+    }
+
+    function toCsvUrl(url) {
+      const trimmed = url.trim();
+      if (!trimmed) return "";
+      if (trimmed.includes("output=csv") || trimmed.endsWith(".csv")) return trimmed;
+
+      const id = trimmed.match(/\/spreadsheets\/d\/([^/]+)/)?.[1];
+      const gid = trimmed.match(/[?&]gid=([^&]+)/)?.[1] || "0";
+      if (id && trimmed.includes("/pubhtml")) return `https://docs.google.com/spreadsheets/d/${id}/pub?gid=${gid}&single=true&output=csv`;
+      if (id) return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
+
+      return trimmed;
+    }
+
+    function driveImageUrl(url = "") {
+      const value = String(url).trim();
+      if (!value) return "";
+
+      const id =
+        value.match(/\/file\/d\/([^/]+)/)?.[1] ||
+        value.match(/[?&]id=([^&]+)/)?.[1] ||
+        value.match(/uc\?export=view&id=([^&]+)/)?.[1];
+
+      if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w1200`;
+      return value;
+    }
+
+    function rowIsActive(product) {
+      const value = normalizeKey(product.status || "");
+      if (!value) return true;
+      return !["nao", "não", "no", "false", "0", "inativo", "ocultar", "esgotado"].includes(value);
+    }
+
+    function mapRows(rows) {
+      const headers = rows[0] || [];
+      const columns = Object.fromEntries(
+        Object.entries(REQUIRED_COLUMNS).map(([key, names]) => [key, findColumn(headers, names)])
+      );
+
+      return rows.slice(1).map(row => {
+        const record = Object.fromEntries(headers.map((header, index) => [header, row[index] || ""]));
+        const get = key => record[columns[key]] || "";
+
+        return {
+          name: get("name").trim(),
+          price: get("price").trim(),
+          description: get("description").trim(),
+          image: driveImageUrl(get("image")),
+          category: get("category").trim() || "Produtos",
+          collection: get("collection").trim() || "Catalogo",
+          status: get("status").trim(),
+          order: Number(get("order")) || 9999,
+          code: get("code").trim(),
+          link: get("link").trim()
+        };
+      })
+        .filter(product => product.name)
+        .filter(rowIsActive)
+        .sort((a, b) => a.order - b.order || a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+    }
+
+    async function loadSheet() {
+      const url = toCsvUrl(els.sheetUrl.value);
+      if (!url) {
+        showToast("Cole o link do Sheets");
+        return;
+      }
+
+      setStatus("Carregando planilha...");
+      saveConfig();
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const text = await response.text();
+        const rows = parseCsv(text);
+        if (rows.length < 2) throw new Error("Planilha vazia");
+        products = mapRows(rows);
+        updateFilters();
+        render();
+        setStatus(`${products.length} produtos carregados.`);
+        showToast("Catalogo atualizado");
+      } catch (error) {
+        setStatus("Nao foi possivel carregar. Verifique se o Sheets esta publicado na web.");
+        showToast("Erro ao carregar");
+      }
+    }
+
+    function loadSample() {
+      products = [
+        {
+          name: "Caixa Afeto",
+          price: "R$ 148",
+          description: "Selecao delicada para presentear com cuidado e textura.",
+          image: "",
+          category: "Presentes",
+          collection: "Dia das Maes",
+          status: "sim",
+          order: 1,
+          code: "MAYA-01",
+          link: ""
+        },
+        {
+          name: "Bandeja Aurora",
+          price: "R$ 96",
+          description: "Composicao em tons claros para mesa posta e pequenos rituais.",
+          image: "",
+          category: "Mesa",
+          collection: "Dia das Maes",
+          status: "sim",
+          order: 2,
+          code: "MAYA-02",
+          link: ""
+        },
+        {
+          name: "Kit Pausa",
+          price: "R$ 72",
+          description: "Um presente compacto, bonito e facil de enviar.",
+          image: "",
+          category: "Presentes",
+          collection: "Essenciais",
+          status: "sim",
+          order: 3,
+          code: "MAYA-03",
+          link: ""
+        },
+        {
+          name: "Vela Serena",
+          price: "R$ 54",
+          description: "Aroma suave, acabamento minimalista e presenca elegante.",
+          image: "",
+          category: "Casa",
+          collection: "Essenciais",
+          status: "sim",
+          order: 4,
+          code: "MAYA-04",
+          link: ""
+        },
+        {
+          name: "Cartao Flor",
+          price: "R$ 18",
+          description: "Complemento impresso para deixar o presente mais pessoal.",
+          image: "",
+          category: "Complementos",
+          collection: "Essenciais",
+          status: "sim",
+          order: 5,
+          code: "MAYA-05",
+          link: ""
+        },
+        {
+          name: "Cesta Jardim",
+          price: "R$ 186",
+          description: "Montagem especial com itens selecionados para datas afetivas.",
+          image: "",
+          category: "Presentes",
+          collection: "Dia das Maes",
+          status: "sim",
+          order: 6,
+          code: "MAYA-06",
+          link: ""
+        }
+      ];
+      updateFilters();
+      render();
+      setStatus("Dados de exemplo carregados.");
+      showToast("Exemplo carregado");
+    }
+
+    function uniqueValues(key) {
+      return [...new Set(products.map(product => product[key]).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
+    }
+
+    function updateSelect(select, values, selected) {
+      const current = selected || select.value || "all";
+      select.innerHTML = `<option value="all">Todas</option>${values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+      select.value = values.includes(current) ? current : "all";
+    }
+
+    function updateFilters() {
+      updateSelect(els.collectionFilter, uniqueValues("collection"), state.collection);
+      updateSelect(els.categoryFilter, uniqueValues("category"), state.category);
+    }
+
+    function filteredProducts() {
+      const collection = els.collectionFilter.value;
+      const category = els.categoryFilter.value;
+      return products
+        .filter(product => collection === "all" || product.collection === collection)
+        .filter(product => category === "all" || product.category === category);
+    }
+
+    function chunk(items, size) {
+      const chunks = [];
+      for (let index = 0; index < items.length; index += size) {
+        chunks.push(items.slice(index, index + size));
+      }
+      return chunks;
+    }
+
+    function coverTitle(items) {
+      const collection = els.collectionFilter.value;
+      if (collection !== "all") return collection;
+      const collections = [...new Set(items.map(product => product.collection).filter(Boolean))];
+      return collections.length === 1 ? collections[0] : "Catalogo";
+    }
+
+    function categoryTitle(items) {
+      const category = els.categoryFilter.value;
+      if (category !== "all") return category;
+      const categories = [...new Set(items.map(product => product.category).filter(Boolean))];
+      return categories.length === 1 ? categories[0] : "Produtos";
+    }
+
+    function productImage(product) {
+      if (product.image) {
+        return `<img class="product-image" src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" loading="lazy">`;
+      }
+      return `<div class="product-image" aria-label="${escapeHtml(product.name)}"></div>`;
+    }
+
+    function productCard(product) {
+      const detail = product.link
+        ? `<a class="product-code" href="${escapeHtml(product.link)}" target="_blank" rel="noreferrer">${escapeHtml(product.code || "Ver produto")}</a>`
+        : `<div class="product-code">${escapeHtml(product.code || product.category)}</div>`;
+
+      return `
+        <article class="product-card">
+          ${productImage(product)}
+          <div class="product-body">
+            <div class="product-top">
+              <div class="product-name">${escapeHtml(product.name)}</div>
+              <div class="product-price">${escapeHtml(product.price)}</div>
+            </div>
+            <div class="product-desc">${escapeHtml(product.description)}</div>
+            ${detail}
+          </div>
+        </article>
+      `;
+    }
+
+    function render() {
+      saveConfig();
+      const items = filteredProducts();
+      const perPage = Number(els.density.value) || 6;
+      const pages = chunk(items, perPage);
+      const totalPageCount = items.length ? pages.length + 1 : 0;
+      const now = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date()).replace(".", "");
+
+      els.totalProducts.textContent = items.length;
+      els.totalPages.textContent = totalPageCount;
+      els.updatedAt.textContent = items.length ? `Atualizado em ${now}` : "Aguardando dados";
+
+      if (!items.length) {
+        els.catalog.innerHTML = `<div class="empty-catalog">Carregue a planilha ou use dados de exemplo</div>`;
+        return;
+      }
+
+      const contact = els.contactLine.value.trim() || "@maya | whatsapp";
+      const title = coverTitle(items);
+      const section = categoryTitle(items);
+
+      els.catalog.innerHTML = `
+        <section class="catalog-page cover">
+          <div class="cover-hero">
+            <div>
+              <div class="cover-brand">MAYA</div>
+              <div class="cover-title">${escapeHtml(title)}</div>
+              <div class="cover-note">Selecao de produtos disponiveis para pedido. Valores e disponibilidade podem mudar conforme estoque.</div>
+            </div>
+          </div>
+          <div class="cover-footer">
+            <span>${escapeHtml(contact)}</span>
+            <span>${escapeHtml(now)}</span>
+          </div>
+        </section>
+        ${pages.map((page, index) => `
+          <section class="catalog-page">
+            <header class="page-head">
+              <h2 class="section-title">${escapeHtml(section)}</h2>
+              <div class="section-kicker">Maya · ${String(index + 1).padStart(2, "0")}</div>
+            </header>
+            <div class="products-grid">
+              ${page.map(productCard).join("")}
+            </div>
+            <footer class="page-footer">
+              <span>${escapeHtml(contact)}</span>
+              <span>${escapeHtml(title)}</span>
+            </footer>
+          </section>
+        `).join("")}
+      `;
+    }
+
+    function setStatus(message) {
+      els.status.textContent = message;
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => els.toast.classList.remove("show"), 1800);
+    }
+
+    function applyInitialState() {
+      els.sheetUrl.value = state.sheetUrl || "";
+      els.density.value = state.density || "6";
+      els.contactLine.value = state.contact || "@maya | whatsapp";
+      updateFilters();
+      render();
+    }
+
+    document.querySelector("#loadSheet").addEventListener("click", loadSheet);
+    document.querySelector("#sampleData").addEventListener("click", loadSample);
+    document.querySelector("#printPdf").addEventListener("click", () => {
+      saveConfig();
+      window.print();
+    });
+
+    [els.collectionFilter, els.categoryFilter, els.density, els.contactLine].forEach(element => {
+      element.addEventListener("input", render);
+    });
+
+    applyInitialState();
+  </script>
+</body>
+</html>
