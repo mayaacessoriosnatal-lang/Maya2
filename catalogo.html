@@ -322,7 +322,7 @@
       background: var(--white);
       display: grid;
       grid-template-rows: auto 1fr auto;
-      gap: 13mm;
+      gap: 9mm;
       page-break-after: always;
       break-after: page;
     }
@@ -389,7 +389,7 @@
       justify-content: space-between;
       gap: 10mm;
       border-bottom: 1px solid var(--line);
-      padding-bottom: 6mm;
+      padding-bottom: 4mm;
     }
 
     .section-title {
@@ -411,7 +411,29 @@
     .products-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6mm;
+      gap: 7mm 6mm;
+      align-content: start;
+    }
+
+    .category-sections {
+      display: grid;
+      align-content: start;
+      gap: 8mm;
+    }
+
+    .category-section {
+      display: grid;
+      align-content: start;
+      gap: 4mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .category-heading {
+      color: var(--peach-deep);
+      font-size: 3mm;
+      letter-spacing: 1.8mm;
+      text-transform: uppercase;
     }
 
     .product-card {
@@ -633,11 +655,14 @@
       }
       .products-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: 6mm !important;
+        gap: 7mm 6mm !important;
       }
       .sheet[data-density="8"] .products-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
         gap: 5mm !important;
+      }
+      .category-sections {
+        gap: 8mm !important;
       }
       .product-image {
         width: 100% !important;
@@ -1150,8 +1175,7 @@
       return chunks;
     }
 
-    function groupedPages(items, perPage) {
-      const groups = [];
+    function categoryGroups(items) {
       const categoryOrder = state.categoryOrder || [];
       const categories = [...new Set(items.map(product => product.category).filter(Boolean))]
         .sort((a, b) => {
@@ -1160,13 +1184,38 @@
           return aRank - bRank || a.localeCompare(b);
         });
 
-      categories.forEach(category => {
-        chunk(items.filter(product => product.category === category), perPage).forEach((page, index) => {
-          groups.push({ category, page, categoryPage: index + 1 });
+      return categories.map(category => ({
+        category,
+        products: items.filter(product => product.category === category)
+      }));
+    }
+
+    function groupedPages(items, perPage) {
+      const pages = [];
+      let currentPage = [];
+      let currentCount = 0;
+
+      categoryGroups(items).forEach(group => {
+        chunk(group.products, perPage).forEach(part => {
+          if (currentCount > 0 && currentCount + part.length > perPage) {
+            pages.push(currentPage);
+            currentPage = [];
+            currentCount = 0;
+          }
+
+          currentPage.push({ category: group.category, products: part });
+          currentCount += part.length;
+
+          if (currentCount >= perPage) {
+            pages.push(currentPage);
+            currentPage = [];
+            currentCount = 0;
+          }
         });
       });
 
-      return groups;
+      if (currentPage.length) pages.push(currentPage);
+      return pages;
     }
 
     function coverTitle(items) {
@@ -1237,14 +1286,21 @@
             <span>${escapeHtml(now)}</span>
           </div>
         </section>
-        ${pages.map((group, index) => `
+        ${pages.map((pageGroups, index) => `
           <section class="catalog-page">
             <header class="page-head">
-              <h2 class="section-title">${escapeHtml(group.category)}</h2>
+              <h2 class="section-title">${escapeHtml(pageGroups.length === 1 ? pageGroups[0]?.category || "Produtos" : "Produtos")}</h2>
               <div class="section-kicker">Maya · ${String(index + 1).padStart(2, "0")}</div>
             </header>
-            <div class="products-grid">
-              ${group.page.map(productCard).join("")}
+            <div class="category-sections">
+              ${pageGroups.map(group => `
+                <section class="category-section">
+                  ${pageGroups.length > 1 ? `<div class="category-heading">${escapeHtml(group.category)}</div>` : ""}
+                  <div class="products-grid">
+                    ${group.products.map(productCard).join("")}
+                  </div>
+                </section>
+              `).join("")}
             </div>
             <footer class="page-footer">
               <span>${escapeHtml(contact)}</span>
