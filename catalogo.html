@@ -25,6 +25,11 @@
 
     * { box-sizing: border-box; }
 
+    html {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -358,20 +363,21 @@
     .products-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 9mm 8mm;
+      gap: 7mm 8mm;
     }
 
     .product-card {
       min-width: 0;
       display: grid;
       grid-template-rows: auto 1fr;
-      gap: 4.5mm;
+      gap: 3mm;
       break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .product-image {
       width: 100%;
-      aspect-ratio: 4 / 5;
+      height: 54mm;
       border: 1px solid rgba(232, 133, 106, 0.18);
       background: var(--off);
       object-fit: cover;
@@ -380,7 +386,7 @@
 
     .product-body {
       display: grid;
-      gap: 2mm;
+      gap: 1.6mm;
     }
 
     .product-top {
@@ -392,29 +398,54 @@
 
     .product-name {
       min-width: 0;
-      font-size: 5mm;
+      font-size: 4.2mm;
       line-height: 1.14;
       font-weight: 400;
     }
 
     .product-price {
       color: var(--peach-deep);
-      font-size: 4.4mm;
+      font-size: 3.7mm;
       font-weight: 400;
       white-space: nowrap;
     }
 
     .product-desc {
       color: var(--mid);
-      font-size: 3.35mm;
-      line-height: 1.45;
+      display: -webkit-box;
+      overflow: hidden;
+      font-size: 2.8mm;
+      line-height: 1.35;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
     .product-code {
       color: var(--light);
-      font-size: 2.7mm;
+      font-size: 2.35mm;
       letter-spacing: 1.2mm;
       text-transform: uppercase;
+    }
+
+    .sheet[data-density="8"] .products-grid {
+      gap: 5mm 7mm;
+    }
+
+    .sheet[data-density="8"] .product-image {
+      height: 38mm;
+    }
+
+    .sheet[data-density="8"] .product-name {
+      font-size: 3.7mm;
+    }
+
+    .sheet[data-density="8"] .product-price {
+      font-size: 3.25mm;
+    }
+
+    .sheet[data-density="8"] .product-desc {
+      font-size: 2.55mm;
+      -webkit-line-clamp: 1;
     }
 
     a.product-code {
@@ -502,13 +533,18 @@
     }
 
     @page {
-      size: A4;
+      size: A4 portrait;
       margin: 0;
     }
 
     @media print {
+      html,
       body {
         background: var(--white);
+        width: 210mm;
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
       .sidebar,
       .topbar,
@@ -523,14 +559,33 @@
         padding: 0;
         margin: 0;
         width: 210mm;
+        max-width: none;
         box-shadow: none;
         border: 0;
       }
       .catalog-page {
         width: 210mm;
+        height: 297mm;
         min-height: 297mm;
+        padding: 14mm;
+        overflow: hidden;
         box-shadow: none;
         border: 0;
+        page-break-after: always;
+        break-after: page;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .catalog-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      .cover {
+        background: var(--peach) !important;
+        color: var(--white) !important;
+      }
+      .cover-hero {
+        border-color: rgba(254, 250, 248, 0.36);
       }
     }
   </style>
@@ -1027,6 +1082,7 @@
       const totalPageCount = items.length ? pages.length + 1 : 0;
       const now = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date()).replace(".", "");
 
+      els.catalog.dataset.density = String(perPage);
       els.totalProducts.textContent = items.length;
       els.totalPages.textContent = totalPageCount;
       els.updatedAt.textContent = items.length ? `Atualizado em ${now}` : "Aguardando dados";
