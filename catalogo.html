@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maya | Catalogo</title>
+  <title>Maya | Catálogo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -278,14 +278,15 @@
       min-height: 297mm;
       align-content: stretch;
       grid-template-rows: 1fr auto;
-      background: linear-gradient(180deg, var(--white), #fff7f4);
+      background: var(--peach);
+      color: var(--white);
     }
 
     .cover-hero {
       display: grid;
       place-items: center;
       text-align: center;
-      border: 1px solid var(--line);
+      border: 1px solid rgba(254, 250, 248, 0.32);
       padding: 18mm;
     }
 
@@ -299,7 +300,7 @@
 
     .cover-title {
       margin-top: 11mm;
-      color: var(--peach-deep);
+      color: var(--white);
       font-size: 4mm;
       letter-spacing: 2.4mm;
       text-transform: uppercase;
@@ -308,7 +309,7 @@
     .cover-note {
       max-width: 112mm;
       margin: 10mm auto 0;
-      color: var(--mid);
+      color: rgba(254, 250, 248, 0.82);
       font-size: 4.2mm;
       line-height: 1.65;
     }
@@ -323,6 +324,10 @@
       font-size: 3mm;
       letter-spacing: 1.4mm;
       text-transform: uppercase;
+    }
+
+    .cover-footer {
+      color: rgba(254, 250, 248, 0.78);
     }
 
     .page-head {
@@ -535,7 +540,7 @@
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-mark">MAYA</div>
-        <div class="brand-sub">Catalogo em PDF</div>
+        <div class="brand-sub">Catálogo em PDF</div>
       </div>
 
       <div class="control-group">
@@ -552,7 +557,7 @@
 
       <div class="control-group control-grid">
         <label class="field">
-          <span>Colecao</span>
+          <span>Coleção</span>
           <select id="collectionFilter">
             <option value="all">Todas</option>
           </select>
@@ -566,8 +571,8 @@
         <label class="field">
           <span>Formato</span>
           <select id="density">
-            <option value="6">6 por pagina</option>
-            <option value="8">8 por pagina</option>
+            <option value="6">6 por página</option>
+            <option value="8">8 por página</option>
           </select>
         </label>
         <label class="field">
@@ -580,7 +585,7 @@
         <div class="label">Resumo</div>
         <div class="stats">
           <div class="stat"><strong id="totalProducts">0</strong><span>produtos</span></div>
-          <div class="stat"><strong id="totalPages">0</strong><span>paginas</span></div>
+          <div class="stat"><strong id="totalPages">0</strong><span>páginas</span></div>
         </div>
       </div>
 
@@ -592,7 +597,7 @@
 
     <main class="main">
       <header class="topbar">
-        <h1 class="page-title">Catalogo Maya</h1>
+        <h1 class="page-title">Catálogo Maya</h1>
         <div class="page-meta" id="updatedAt">Aguardando dados</div>
       </header>
 
@@ -665,6 +670,19 @@
         '"': "&quot;",
         "'": "&#039;"
       }[char]));
+    }
+
+    function fixEncoding(value = "") {
+      const text = String(value);
+      if (!/[ÃÂâ]/.test(text)) return text;
+
+      try {
+        const bytes = Uint8Array.from([...text].map(char => char.charCodeAt(0) & 255));
+        const decoded = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+        return decoded || text;
+      } catch (error) {
+        return text;
+      }
     }
 
     function normalizeKey(value = "") {
@@ -797,7 +815,7 @@
 
       return rows.slice(1).map(row => {
         const record = Object.fromEntries(headers.map((header, index) => [header, row[index] || ""]));
-        const get = key => record[columns[key]] || "";
+        const get = key => fixEncoding(record[columns[key]] || "");
 
         return {
           name: get("name").trim(),
@@ -805,7 +823,7 @@
           description: get("description").trim(),
           image: driveImageUrl(get("image")),
           category: get("category").trim() || "Produtos",
-          collection: get("collection").trim() || "Catalogo",
+          collection: get("collection").trim() || "Catálogo",
           status: get("status").trim(),
           stock: parseStock(get("stock")),
           hasStockColumn: Boolean(columns.stock),
@@ -840,9 +858,9 @@
         updateFilters();
         render();
         setStatus(`${products.length} produtos carregados.`);
-        showToast("Catalogo atualizado");
+        showToast("Catálogo atualizado");
       } catch (error) {
-        setStatus("Nao foi possivel carregar. Verifique se o Sheets esta publicado na web.");
+        setStatus("Não foi possível carregar. Verifique se o Sheets está publicado na web.");
         showToast("Erro ao carregar");
       }
     }
@@ -852,10 +870,10 @@
         {
           name: "Caixa Afeto",
           price: "R$ 148",
-          description: "Selecao delicada para presentear com cuidado e textura.",
+          description: "Seleção delicada para presentear com cuidado e textura.",
           image: "",
           category: "Presentes",
-          collection: "Dia das Maes",
+          collection: "Dia das Mães",
           status: "sim",
           order: 1,
           code: "MAYA-01",
@@ -864,10 +882,10 @@
         {
           name: "Bandeja Aurora",
           price: "R$ 96",
-          description: "Composicao em tons claros para mesa posta e pequenos rituais.",
+          description: "Composição em tons claros para mesa posta e pequenos rituais.",
           image: "",
           category: "Mesa",
-          collection: "Dia das Maes",
+          collection: "Dia das Mães",
           status: "sim",
           order: 2,
           code: "MAYA-02",
@@ -915,7 +933,7 @@
           description: "Montagem especial com itens selecionados para datas afetivas.",
           image: "",
           category: "Presentes",
-          collection: "Dia das Maes",
+          collection: "Dia das Mães",
           status: "sim",
           order: 6,
           code: "MAYA-06",
@@ -964,7 +982,7 @@
       const collection = els.collectionFilter.value;
       if (collection !== "all") return collection;
       const collections = [...new Set(items.map(product => product.collection).filter(Boolean))];
-      return collections.length === 1 ? collections[0] : "Catalogo";
+      return collections.length === 1 ? collections[0] : "Catálogo";
     }
 
     function categoryTitle(items) {
@@ -1028,7 +1046,7 @@
             <div>
               <div class="cover-brand">MAYA</div>
               <div class="cover-title">${escapeHtml(title)}</div>
-              <div class="cover-note">Selecao de produtos disponiveis para pedido. Valores e disponibilidade podem mudar conforme estoque.</div>
+              <div class="cover-note">Seleção de produtos disponíveis para pedido. Valores e disponibilidade podem mudar conforme estoque.</div>
             </div>
           </div>
           <div class="cover-footer">
