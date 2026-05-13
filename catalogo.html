@@ -690,6 +690,14 @@
           </select>
         </label>
         <label class="field">
+          <span>Qualidade</span>
+          <select id="imageQuality">
+            <option value="whatsapp">WhatsApp leve</option>
+            <option value="standard">Padrão</option>
+            <option value="high">Alta</option>
+          </select>
+        </label>
+        <label class="field">
           <span>Contato</span>
           <input id="contactLine" type="text" value="@maya | whatsapp">
         </label>
@@ -754,6 +762,7 @@
       collectionFilter: document.querySelector("#collectionFilter"),
       categoryFilter: document.querySelector("#categoryFilter"),
       density: document.querySelector("#density"),
+      imageQuality: document.querySelector("#imageQuality"),
       contactLine: document.querySelector("#contactLine"),
       categoryOrder: document.querySelector("#categoryOrder"),
       totalProducts: document.querySelector("#totalProducts"),
@@ -779,6 +788,7 @@
         collection: els.collectionFilter.value,
         category: els.categoryFilter.value,
         density: els.density.value,
+        imageQuality: els.imageQuality.value,
         contact: els.contactLine.value.trim(),
         categoryOrder: state.categoryOrder || []
       };
@@ -876,6 +886,15 @@
       return trimmed;
     }
 
+    function imageSize() {
+      const quality = els.imageQuality?.value || state.imageQuality || "whatsapp";
+      return {
+        whatsapp: 420,
+        standard: 700,
+        high: 1000
+      }[quality] || 420;
+    }
+
     function driveImageUrl(url = "") {
       const value = String(url).trim();
       if (!value) return "";
@@ -885,7 +904,7 @@
         value.match(/[?&]id=([^&]+)/)?.[1] ||
         value.match(/uc\?export=view&id=([^&]+)/)?.[1];
 
-      if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
+      if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w${imageSize()}`;
       return value;
     }
 
@@ -944,6 +963,7 @@
           name: get("name").trim(),
           price: formatPrice(get("price")),
           description: get("description").trim(),
+          imageSource: get("image").trim(),
           image: driveImageUrl(get("image")),
           category: get("category").trim() || "Produtos",
           collection: get("collection").trim() || "Catálogo",
@@ -1066,6 +1086,13 @@
       render();
       setStatus("Dados de exemplo carregados.");
       showToast("Exemplo carregado");
+    }
+
+    function refreshImageUrls() {
+      products = products.map(product => ({
+        ...product,
+        image: driveImageUrl(product.imageSource || product.image)
+      }));
     }
 
     function uniqueValues(key) {
@@ -1323,10 +1350,54 @@
       return Promise.all(pending);
     }
 
+    function canvasBlob(canvas, quality) {
+      return new Promise(resolve => {
+        canvas.toBlob(resolve, "image/jpeg", quality);
+      });
+    }
+
+    async function compressImageElement(image) {
+      if (image.dataset.compressed === "true" || !image.complete || !image.naturalWidth) return;
+
+      const size = imageSize();
+      const scale = Math.min(1, size / Math.max(image.naturalWidth, image.naturalHeight));
+      const width = Math.max(1, Math.round(image.naturalWidth * scale));
+      const height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      context.fillStyle = "#FEFAF8";
+      context.fillRect(0, 0, width, height);
+      context.drawImage(image, 0, 0, width, height);
+
+      try {
+        const quality = els.imageQuality.value === "high" ? 0.82 : els.imageQuality.value === "standard" ? 0.72 : 0.58;
+        const blob = await canvasBlob(canvas, quality);
+        if (!blob) return;
+        const oldUrl = image.dataset.objectUrl;
+        const objectUrl = URL.createObjectURL(blob);
+        image.dataset.objectUrl = objectUrl;
+        image.dataset.compressed = "true";
+        image.src = objectUrl;
+        if (oldUrl) URL.revokeObjectURL(oldUrl);
+      } catch (error) {
+        image.dataset.compressed = "error";
+      }
+    }
+
+    async function prepareImagesForPdf() {
+      await waitForImages();
+      const images = [...els.catalog.querySelectorAll("img")];
+      await Promise.all(images.map(compressImageElement));
+      await waitForImages();
+    }
+
     function applyInitialState() {
       const shouldUpgradeDensity = !state.version || state.version < CONFIG_VERSION;
       els.sheetUrl.value = state.sheetUrl || DEFAULT_SHEET_URL;
       els.density.value = shouldUpgradeDensity ? "9" : state.density || "9";
+      els.imageQuality.value = state.imageQuality || "whatsapp";
       els.contactLine.value = state.contact || "@maya | whatsapp";
       updateFilters();
       render();
@@ -1338,7 +1409,7 @@
     document.querySelector("#printPdf").addEventListener("click", async () => {
       saveConfig();
       setStatus("Preparando imagens para o PDF...");
-      await waitForImages();
+      await prepareImagesForPdf();
       setStatus("Imagens prontas. Abrindo impressão...");
       window.print();
       setStatus(`${filteredProducts().length} produtos carregados.`);
@@ -1346,6 +1417,12 @@
 
     [els.collectionFilter, els.categoryFilter, els.density, els.contactLine].forEach(element => {
       element.addEventListener("input", render);
+    });
+
+    els.imageQuality.addEventListener("input", () => {
+      refreshImageUrls();
+      render();
+      setStatus("Qualidade das imagens atualizada. Gere o PDF novamente.");
     });
 
     els.categoryOrder.addEventListener("click", event => {
