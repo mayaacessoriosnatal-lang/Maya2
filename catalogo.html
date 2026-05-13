@@ -885,7 +885,7 @@
         value.match(/[?&]id=([^&]+)/)?.[1] ||
         value.match(/uc\?export=view&id=([^&]+)/)?.[1];
 
-      if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w1200`;
+      if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
       return value;
     }
 
