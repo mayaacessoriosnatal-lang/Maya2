@@ -495,8 +495,8 @@
     }
 
     .sheet[data-density="6"] .products-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6mm;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6.5mm 7mm;
     }
 
     .sheet[data-density="4"] .products-grid {
@@ -683,8 +683,8 @@
         gap: 5mm 6mm !important;
       }
       .sheet[data-density="6"] .products-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: 6mm !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 6.5mm 7mm !important;
       }
       .sheet[data-density="4"] .products-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -1267,7 +1267,7 @@
       return {
         12: { columns: 4, rows: 3 },
         9: { columns: 3, rows: 3 },
-        6: { columns: 3, rows: 2 },
+        6: { columns: 2, rows: 3 },
         4: { columns: 2, rows: 2 }
       }[perPage] || { columns: 3, rows: 3 };
     }
