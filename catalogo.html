@@ -308,6 +308,23 @@
       gap: 18px;
     }
 
+    .preview-bar {
+      width: min(100%, 960px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--mid);
+      font-size: 10px;
+      letter-spacing: 2.6px;
+      text-transform: uppercase;
+    }
+
+    .preview-bar strong {
+      color: var(--peach-deep);
+      font-weight: 400;
+    }
+
     .sheet {
       width: min(100%, 960px);
       background: var(--white);
@@ -467,7 +484,7 @@
       text-transform: uppercase;
     }
 
-    .sheet[data-density="8"] .products-grid {
+    .sheet[data-density="12"] .products-grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 5mm;
     }
@@ -477,16 +494,41 @@
       gap: 5mm 6mm;
     }
 
-    .sheet[data-density="8"] .product-name {
+    .sheet[data-density="6"] .products-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6mm;
+    }
+
+    .sheet[data-density="4"] .products-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7mm;
+    }
+
+    .sheet[data-density="12"] .product-name {
       font-size: 3.15mm;
     }
 
-    .sheet[data-density="8"] .product-price {
+    .sheet[data-density="12"] .product-price {
       font-size: 2.85mm;
     }
 
-    .sheet[data-density="8"] .product-code {
+    .sheet[data-density="12"] .product-code {
       font-size: 2mm;
+    }
+
+    .sheet[data-density="6"] .product-name,
+    .sheet[data-density="4"] .product-name {
+      font-size: 3.95mm;
+    }
+
+    .sheet[data-density="6"] .product-price,
+    .sheet[data-density="4"] .product-price {
+      font-size: 3.35mm;
+    }
+
+    .sheet[data-density="6"] .product-code,
+    .sheet[data-density="4"] .product-code {
+      font-size: 2.45mm;
     }
 
     a.product-code {
@@ -557,6 +599,10 @@
       .page-meta { text-align: left; }
       .control-grid { grid-template-columns: 1fr; }
       .button-row { grid-template-columns: 1fr; }
+      .preview-bar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
       .catalog-page {
         padding: 18px;
         gap: 26px;
@@ -584,6 +630,7 @@
       }
       .sidebar,
       .topbar,
+      .preview-bar,
       .toast {
         display: none !important;
       }
@@ -627,13 +674,21 @@
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
         gap: 5.5mm 6mm !important;
       }
-      .sheet[data-density="8"] .products-grid {
+      .sheet[data-density="12"] .products-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
         gap: 5mm !important;
       }
       .sheet[data-density="9"] .products-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
         gap: 5mm 6mm !important;
+      }
+      .sheet[data-density="6"] .products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 6mm !important;
+      }
+      .sheet[data-density="4"] .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 7mm !important;
       }
       .category-sections {
         gap: 5mm !important;
@@ -682,11 +737,12 @@
           </select>
         </label>
         <label class="field">
-          <span>Formato</span>
+          <span>Tamanho das imagens</span>
           <select id="density">
-            <option value="9">9 por página</option>
-            <option value="6">6 por página</option>
-            <option value="8">8 por página</option>
+            <option value="12">Pequenas · até 12 por página</option>
+            <option value="9">Médias · até 9 por página</option>
+            <option value="6">Grandes · até 6 por página</option>
+            <option value="4">Extra grandes · até 4 por página</option>
           </select>
         </label>
         <label class="field">
@@ -729,6 +785,10 @@
       </header>
 
       <section class="catalog-stage">
+        <div class="preview-bar">
+          <strong>Prévia do PDF</strong>
+          <span id="previewMeta">Aguardando produtos</span>
+        </div>
         <div class="sheet" id="catalog"></div>
       </section>
     </main>
@@ -767,6 +827,7 @@
       categoryOrder: document.querySelector("#categoryOrder"),
       totalProducts: document.querySelector("#totalProducts"),
       totalPages: document.querySelector("#totalPages"),
+      previewMeta: document.querySelector("#previewMeta"),
       updatedAt: document.querySelector("#updatedAt"),
       status: document.querySelector("#status"),
       catalog: document.querySelector("#catalog"),
@@ -1202,11 +1263,19 @@
       return pageGroups.reduce((total, group) => total + groupRows(group.products.length, columns), 0);
     }
 
+    function layoutForPerPage(perPage) {
+      return {
+        12: { columns: 4, rows: 3 },
+        9: { columns: 3, rows: 3 },
+        6: { columns: 3, rows: 2 },
+        4: { columns: 2, rows: 2 }
+      }[perPage] || { columns: 3, rows: 3 };
+    }
+
     function groupedPages(items, perPage) {
       const pages = [];
       let currentPage = [];
-      const columns = perPage === 8 ? 4 : 3;
-      const maxRows = perPage === 8 ? 2 : 3;
+      const { columns, rows: maxRows } = layoutForPerPage(perPage);
 
       categoryGroups(items).forEach(group => {
         let remaining = [...group.products];
@@ -1282,6 +1351,9 @@
       els.catalog.dataset.density = String(perPage);
       els.totalProducts.textContent = items.length;
       els.totalPages.textContent = totalPageCount;
+      els.previewMeta.textContent = items.length
+        ? `${totalPageCount} páginas · ${perPage} produtos por página`
+        : "Aguardando produtos";
       els.updatedAt.textContent = items.length ? `Atualizado em ${now}` : "Aguardando dados";
 
       if (!items.length) {
@@ -1396,7 +1468,7 @@
     function applyInitialState() {
       const shouldUpgradeDensity = !state.version || state.version < CONFIG_VERSION;
       els.sheetUrl.value = state.sheetUrl || DEFAULT_SHEET_URL;
-      els.density.value = shouldUpgradeDensity ? "9" : state.density || "9";
+      els.density.value = shouldUpgradeDensity || state.density === "8" ? "9" : state.density || "9";
       els.imageQuality.value = state.imageQuality || "whatsapp";
       els.contactLine.value = state.contact || "@maya | whatsapp";
       updateFilters();
