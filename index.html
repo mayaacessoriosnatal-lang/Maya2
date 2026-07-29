@@ -317,10 +317,12 @@
       const lines=String(text||'').trim().split(/\r?\n/).filter(Boolean);
       if(!lines.length)return[];
       const headers=parseLine(lines[0]).map(h=>normalizeKey(h));
-      return lines.slice(1).map(line=>{
+      return lines.slice(1).map((line,i)=>{
         const vals=parseLine(line),obj={};
-        headers.forEach((h,i)=>obj[h]=(vals[i]||'').trim());
-        return normalizeProduct(obj);
+        headers.forEach((h,j)=>obj[h]=(vals[j]||'').trim());
+        const p=normalizeProduct(obj);
+        p.rowIndex=i;
+        return p;
       }).filter(p=>p.nome&&(p.preco||p.preco===0));
     }
 
@@ -378,10 +380,7 @@
       currentFilter=filter;
       const list=(filter==='all'?allProducts:allProducts.filter(p=>(p.categoria||'').toLowerCase()===filter))
         .filter(p=>p.estoque!==0)
-        .slice().sort((a,b)=>{
-          const dA=parseEntrada(a.data_entrada),dB=parseEntrada(b.data_entrada);
-          if(dA&&dB)return dB-dA;if(dA)return-1;if(dB)return 1;return 0;
-        });
+        .slice().sort((a,b)=>b.rowIndex-a.rowIndex);
 
       document.getElementById('productCount').textContent=`${list.length} ${list.length===1?'peça':'peças'}`;
       const grid=document.getElementById('productsGrid');
